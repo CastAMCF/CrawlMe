@@ -5,7 +5,7 @@ Qualquer coisa sobre imagens
 
 Desc</br></br></br>
 
-Bugs corridos</br>
+Bugs corrigidos</br>
 Cenas a apontar</br>
 <!--*De resto **acho** q tá bom*-->
 <br/><br/>

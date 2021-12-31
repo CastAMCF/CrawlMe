@@ -58,6 +58,9 @@ public class EDACrawler {
             	if(src.contains("../")) {
             		src = src.replace("../","");
             	}
+            	if(src.contains("/./")) {
+            		src = src.replace("/./","/");
+            	}
             	/*if (!payload.imgs.contains(src)) {
             		System.out.println("src: " + src);
             		if(title.length() > 0) {

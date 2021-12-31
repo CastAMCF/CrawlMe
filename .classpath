@@ -37,6 +37,8 @@
 	<classpathentry kind="lib" path="D:/Games/eclipse-workspace/EDACrawler/lib/batik-util-1.14.jar"/>
 	<classpathentry kind="lib" path="D:/Games/eclipse-workspace/EDACrawler/lib/batik-util-1.14-tests.jar"/>
 	<classpathentry kind="lib" path="D:/Games/eclipse-workspace/EDACrawler/lib/batik-xml-1.14.jar"/>
+	<classpathentry kind="lib" path="D:/Games/eclipse-workspace/EDACrawler/lib/jgoodies-forms-1.8.0.jar"/>
+	<classpathentry kind="lib" path="D:/Games/eclipse-workspace/EDACrawler/lib/jgoodies-forms-1.8.0-sources.jar"/>
 	<classpathentry kind="lib" path="D:/Games/eclipse-workspace/EDACrawler/lib/jsoup-1.7.3.jar"/>
 	<classpathentry kind="lib" path="D:/Games/eclipse-workspace/EDACrawler/lib/rhino-1.7.7.jar"/>
 	<classpathentry kind="lib" path="D:/Games/eclipse-workspace/EDACrawler/lib/serializer-2.7.2.jar"/>

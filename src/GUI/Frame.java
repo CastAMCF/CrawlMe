@@ -389,8 +389,8 @@ public class Frame extends JFrame {
 		JLabel lblImgNome;
 		JPanel panel1;
 		
-		//System.out.println(img);
-		if(img.contains(".svg") || img.contains(".gif") || img.contains(".apng") || img.contains(".jpg") || img.contains(".png") || img.contains(".jpeg") || img.contains(".jfif")) {
+		System.out.println(img);
+		//if(img.contains(".php") || img.contains(".svg") || img.contains(".gif") || img.contains(".apng") || img.contains(".jpg") || img.contains(".png") || img.contains(".jpeg") || img.contains(".jfif")) {
 			if(!img.endsWith(".svg")) {
     			//System.out.println(img);
     			
@@ -406,7 +406,11 @@ public class Frame extends JFrame {
 	    	                @Override
 	    	                public void run(){
 	    	                	try {
-									API.saveImage(img, nome2);
+	    	                		if(nome2.endsWith(".php")) {
+	    	                			API.saveImage(img, nome2.split("\\.")[0] + ".png");
+	    	                		}else {
+	    	                			API.saveImage(img, nome2);
+	    	                		}
 									
 									JOptionPane.showMessageDialog(null,"Imagem salva com sucesso" ,"Sucesso", JOptionPane.INFORMATION_MESSAGE);
 								} catch (IOException e) {
@@ -710,7 +714,7 @@ public class Frame extends JFrame {
 	                if(width >= 5) { width = 0; width = 0; height++;}
     			}
     		}
-		}
+		//}
 		
 		//lblStatus.setText("Estado: " + (iVer++) + "\t/\t" + imgs.size());
 		progressBar.setValue(iVer++);

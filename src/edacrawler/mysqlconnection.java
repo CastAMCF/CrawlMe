@@ -10,7 +10,7 @@ public class mysqlconnection {
 		
 		try {
 			//Class.forName("com.mysql.jdbc.Driver");
-			Connection conexao = DriverManager.getConnection("jdbc:mysql://localhost/teste", "root", "rootroot");
+			Connection conexao = DriverManager.getConnection("jdbc:mysql://localhost/crawlerdb", "root", "rootroot");
 			return conexao;
 		}catch(Exception e1) {return null;}
 	}

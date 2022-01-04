@@ -3,8 +3,13 @@ package GUI;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,6 +21,7 @@ import org.apache.batik.swing.JSVGCanvas;
 import de.javasoft.plaf.synthetica.SyntheticaSimple2DLookAndFeel;
 import edacrawler.API;
 import edacrawler.Payload;
+import edacrawler.mysqlconnection;
 
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -30,9 +36,13 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.*;
 import java.awt.event.ActionEvent;
 import java.awt.Toolkit;
 import java.awt.Color;
@@ -42,6 +52,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+
 import java.awt.GridBagLayout;
 import javax.swing.JProgressBar;
 
@@ -49,16 +61,22 @@ import javax.swing.JProgressBar;
 public class Frame extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField textLink;
+	private static JTextField textLink;
 	private JTextField textTema;
 	private static JPanel panel;
 	private static JButton btnFiltrar;
+	private static JButton btnDownloadAllImg;
 	private static JProgressBar progressBar;
+	public static JCheckBox chckbxAutosave;
+	public static JCheckBox chckbxOfflineSearch;
 	private static boolean bool = false;
 	private static int width = 0;
 	private static int height = 0;
 	private static int iVer = 1;
 	private Thread th;
+	private Thread th2;
+	private Thread th4;
+	private Thread th5;
 	private LinkedHashMap<String, ArrayList<String>> Himgs;
 	private static JLabel lName;
 	private static JPanel pName;
@@ -91,6 +109,7 @@ public class Frame extends JFrame {
 	 * Create the frame.
 	 */
 	public Frame() {
+		setTitle("CrawlMe");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1160, 728);
 		contentPane = new JPanel();
@@ -129,13 +148,8 @@ public class Frame extends JFrame {
 		lblNvel.setBounds(12, 64, 48, 16);
 		contentPane.add(lblNvel);
 		
-		JLabel lblStatus = new JLabel("Estado: Inativo");
-		lblStatus.setVisible(false);
-		lblStatus.setBounds(12, 127, 542, 16);
-		contentPane.add(lblStatus);
-		
 		progressBar = new JProgressBar();
-		progressBar.setBounds(12, 127, 686, 16);
+		progressBar.setBounds(12, 134, 686, 16);
 		contentPane.add(progressBar);
 		
 		JSlider Slider = new JSlider();
@@ -149,13 +163,50 @@ public class Frame extends JFrame {
 		contentPane.add(Slider);
 		
 		JCheckBox chckbxMesmoDomnio = new JCheckBox("Mesmo dom\u00EDnio");
-		chckbxMesmoDomnio.setBounds(566, 53, 132, 25);
+		chckbxMesmoDomnio.setBounds(490, 43, 142, 15);
 		contentPane.add(chckbxMesmoDomnio);
+		
+		chckbxAutosave = new JCheckBox("Guardar dados da pesquisa");
+		chckbxAutosave.setBounds(490, 56, 192, 25);
+		contentPane.add(chckbxAutosave);
+		
+		chckbxOfflineSearch = new JCheckBox("Pesquisa p. dados guardados");
+		chckbxOfflineSearch.setBounds(490, 75, 208, 25);
+		contentPane.add(chckbxOfflineSearch);
+		
+		JButton btnVoltar = new JButton();
+		btnVoltar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent paramActionEvent) {
+				
+				th4 = new Thread() {
+	                @Override
+	                public void run(){
+	                	
+	                	progressBar.setValue(Himgs.size());
+	                	panel.removeAll();
+				    	
+				    	width = 0;
+				    	height = 0;
+				    	iVer = 1;
+				    	for(String img : Himgs.keySet()) {
+				    		addImageToPanel(Himgs, img);
+				    	}
+				    	
+				    	btnVoltar.setEnabled(false);
+	                }
+				};th4.start();
+				
+			}
+		});
+		btnVoltar.setText("Voltar");
+		btnVoltar.setEnabled(false);
+		btnVoltar.setBounds(938, 85, 95, 25);
+		contentPane.add(btnVoltar);
 		
 		btnFiltrar = new JButton();
 		btnFiltrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Thread th2 = new Thread() {
+				th2 = new Thread() {
 	                @Override
 	                public void run(){
 	                	
@@ -176,6 +227,7 @@ public class Frame extends JFrame {
 		                			for (String value : Himgs.get(key)) {
 		                				if(API.removerSpecialCharacter(value.toLowerCase()).contains(API.removerSpecialCharacter(textTema.getText().toLowerCase()))) {
 		                					addImageToPanel(Himgs, key);
+		                					break;
 		                				}
 		                			}
 		                			
@@ -183,14 +235,14 @@ public class Frame extends JFrame {
 		                	}
 		                	progressBar.setValue(progressBar.getMaximum());
 	                	}
-	                	
+	                	btnVoltar.setEnabled(true);
 	                }
 				};th2.start();
 			}
 		});
 		btnFiltrar.setEnabled(false);
 		btnFiltrar.setText("Filtrar");
-		btnFiltrar.setBounds(888, 92, 95, 25);
+		btnFiltrar.setBounds(828, 85, 95, 25);
 		contentPane.add(btnFiltrar);
 		
 		JButton btnSearch = new JButton();
@@ -201,8 +253,10 @@ public class Frame extends JFrame {
 				th = new Thread() {
 	                @Override
 	                public void run(){
-	                	//lblStatus.setForeground(new Color(255, 102, 0));
-	                	//lblStatus.setText("Estado: Procurando as imagens...");
+	                	long milis1 = System.currentTimeMillis();
+	                	SimpleDateFormat formatter= new SimpleDateFormat("HH:mm:ss z");
+	                	Date date = new Date(milis1);
+	                	System.out.println("Start Search: " + formatter.format(date));
 	                	progressBar.setValue(1);
 	                	
 						String link = textLink.getText();
@@ -227,12 +281,11 @@ public class Frame extends JFrame {
 				    	//ArrayList<String> imgs = API.removeDuplicates(imgsDu);
 				    	//System.out.println(Himgs);
 				    	
-				    	//lblStatus.setText("Estado: 0\t/\t" + imgs.size());
-				    	
 				    	LinkedHashMap<String, ArrayList<String>> imgs = new LinkedHashMap<String, ArrayList<String>>();
 				    	if(textTema.getText().isEmpty()) {
 				    		imgs = Himgs;
 				    		progressBar.setMaximum(imgs.size());
+				    		System.out.println("Imagens: " + imgs.size());
 				    	}else {
 				    		for (String key : Himgs.keySet()) {
 		                		//System.out.println("key: " + key + " value: " + Himgs.get(key));
@@ -252,9 +305,14 @@ public class Frame extends JFrame {
 		                		}
 		                	}
 				    		progressBar.setMaximum(imgs.size());
+				    		System.out.println(imgs.size());
 				    	}
+				    	long milis2 = System.currentTimeMillis();
+				    	Date date1 = new Date(milis2);
+				    	System.out.println("End Search | Start Display: " + formatter.format(date1) + " - Time: " + (new SimpleDateFormat("mm:ss:SSS")).format(new Date(milis2 - milis1)));
 				    	
 				    	btnFiltrar.setEnabled(false);
+				    	btnDownloadAllImg.setEnabled(false);
 				    	panel.removeAll();
 				    	
 				    	width = 0;
@@ -264,30 +322,47 @@ public class Frame extends JFrame {
 				    		addImageToPanel(imgs, img);
 				    	}
 				    	
-				    	//lblStatus.setForeground(new Color(51, 153, 0));
-				    	//lblStatus.setText("Estado: Acabado");
+				    	long milis3 = System.currentTimeMillis();
+				    	Date date2 = new Date(System.currentTimeMillis());
+				    	System.out.println("End Display: " + formatter.format(date2) + " - Time: " + (new SimpleDateFormat("mm:ss:SSS")).format(new Date(milis3 - milis2)));
+
 					}
 		        };th.start();
 				
 			}
 		});
-		
 		btnSearch.setText("Procurar");
-		btnSearch.setBounds(503, 90, 95, 25);
+		btnSearch.setBounds(494, 102, 95, 25);
 		contentPane.add(btnSearch);
 		
 		JButton btnCancel = new JButton();
 		btnCancel.addActionListener(new ActionListener() {
 			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent arg0) {
-				th.stop();
-				//lblStatus.setForeground(new Color(204, 0, 0));
-				//lblStatus.setText("Estado: Cancelado");
-				progressBar.setValue(0);
+				
+				if(th.isAlive()) {
+					th.stop();
+					progressBar.setValue(0);
+				}
+				
+				if(th2.isAlive()) {
+					th2.stop();
+					progressBar.setValue(0);
+				}
+				
+				if(th4.isAlive()) {
+					th4.stop();
+					progressBar.setValue(0);
+				}
+				
+				if(th5.isAlive()) {
+					th5.stop();
+					progressBar.setValue(0);
+				}
 			}
 		});
 		btnCancel.setText("Cancelar");
-		btnCancel.setBounds(603, 90, 88, 25);
+		btnCancel.setBounds(603, 102, 88, 25);
 		contentPane.add(btnCancel);
 		
 		textLink = new JTextField();
@@ -296,92 +371,142 @@ public class Frame extends JFrame {
 		
 		JLabel lblTema = new JLabel("Tema");
 		lblTema.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTema.setBounds(901, 17, 56, 16);
+		lblTema.setBounds(901, 16, 56, 16);
 		contentPane.add(lblTema);
 		
 		textTema = new JTextField();
-		textTema.setBounds(818, 53, 228, 27);
+		textTema.setBounds(818, 45, 228, 27);
 		contentPane.add(textTema);
 		
-		/*JLabel lblUrl = new JLabel("Url");
-		lblUrl.setBounds(96, 93, 56, 16);
-		contentPane.add(lblUrl);
-		
-		textField = new JTextField();
-		textField.setBounds(96, 122, 225, 22);
-		contentPane.add(textField);
-		textField.setColumns(10);
-		
-		JLabel btnNewButton = new JLabel();
-		btnNewButton.setOpaque(true);
-		btnNewButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent paramMouseEvent) {
-				btnNewButton.setBackground(new Color(0, 102, 255));
-				btnNewButton.setForeground(new Color(255, 255, 255));
-				
-				if(!bool){
-					bool = true;
-				}else {
-					String iLink = "";
-					for (String url : ini.imgs) {
-						if(url.endsWith(btnNewButton.getText())) {
-							iLink = url;
-							break;
-						}
-					}
-					
-					if (btnNewButton.getIcon() != null) {
-			            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			            int w = (int)(screenSize.width * 0.75);
-			            int h = (int)(screenSize.height * 0.75);
-			            
-			            BufferedImage image = null;
-			    		try {
-			    			image = ImageIO.read(new URL(iLink));
-			    		} catch (IOException e) {
-			    			// TODO Auto-generated catch block
-			    			e.printStackTrace();
-			    		}
-			            
-			            ImageIcon img = resizeProportional(new ImageIcon(image), w, h);
-			            showImage(img);
-			        }
-				}
-			}
-		});
-		btnNewButton.setBounds(145, 282, 220, 220);
-		btnNewButton.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnNewButton.setVerticalTextPosition(SwingConstants.BOTTOM);
-		contentPane.add(btnNewButton);
-		
-		btnNewButton_1 = new JButton("New button");
-		btnNewButton_1.addActionListener(new ActionListener() {
+		JButton btnResetDB = new JButton();
+		btnResetDB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				try {
-					EDACrawler eda = new EDACrawler();
-					ini = eda.process("http://orion.ipt.pt/");
-					
-					for (String url : ini.imgs) {
-						
-						setImageByPath(btnNewButton, url);
-						
-						btnNewButton.setText(url.split("/")[url.split("/").length-1]);
-						
-						break;
-					}
-					
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				Thread th3 = new Thread() {
+	                @Override
+	                public void run(){
+						Connection connection = mysqlconnection.bdconnector();
+		    			
+		    			String sql = "DELETE FROM images";
+		    			String sql2 = "DELETE FROM linksvisitados";
+		    			
+						try {
+							PreparedStatement statement2 = connection.prepareStatement(sql2);
+							
+			    			PreparedStatement statement = connection.prepareStatement(sql);
+			    			
+			    			statement.executeUpdate();
+			    			statement2.executeUpdate();
+			    			
+			            	statement.close();
+			            	statement2.close();
+			            	connection.close();
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						}
+	                }
+		        };th3.start();
+			}
+		});
+		btnResetDB.setText("Eliminar todos os dados guardados");
+		btnResetDB.setBounds(703, 125, 241, 25);
+		contentPane.add(btnResetDB);
+		
+		btnDownloadAllImg = new JButton();
+		btnDownloadAllImg.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				th5 = new Thread() {
+	                @Override
+	                public void run(){
+	                	
+	                	Object[] options1 = { "PNG", "ZIP", "Cancelar" };
+	            		
+				        int result = JOptionPane.showOptionDialog(null, "Escolha o formato que pretende", "CrawlMe", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, null);
+				        if (result == JOptionPane.YES_OPTION){
+				        
+							try {
+			            		JFileChooser chooser = new JFileChooser();
+			            		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			    				int returnVal = chooser.showOpenDialog(null);
+			    				
+			    				if(returnVal == JFileChooser.APPROVE_OPTION) {
+			    					
+			    					for(String img : Himgs.keySet()) {
+				    					String nome1 = "";
+					    	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
+					                	
+				                		if(nome1.endsWith(".php")) {
+				                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + generateRandomString() + ".png");
+				                		}else {
+				                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + generateRandomString() + "." + nome1.split("\\.")[1]);
+				                		}
+			    					}
+									JOptionPane.showMessageDialog(null,"Imagens salvas com sucesso" ,"Sucesso", JOptionPane.INFORMATION_MESSAGE);
+			    				}
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								JOptionPane.showMessageDialog(null,"Houve um erro ao salvar a imagem." ,"Erro", JOptionPane.ERROR_MESSAGE);
+							}
+				        }
+				        if (result == JOptionPane.NO_OPTION){
+				        	
+				        	try {
+			            		JFileChooser chooser = new JFileChooser();
+			            		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			    				int returnVal = chooser.showOpenDialog(null);
+			    				
+			    				if(returnVal == JFileChooser.APPROVE_OPTION) {
+			    					
+			    					File f = new File(chooser.getSelectedFile().getAbsolutePath() + "\\Imagens.zip");
+				    	    		ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f));
+			    					
+			    					for(String img : Himgs.keySet()) {
+				    					String nome1 = "";
+					    	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
+					    	    		if(nome1.endsWith(".php")) { nome1 = nome1.split("\\.")[0] + ".png";}
+					    	    		
+					    	    		ZipEntry e = new ZipEntry(generateRandomString() + "." + nome1.split("\\.")[1]);
+					    	    		out.putNextEntry(e);
+					    	    		URL url = new URL(img);
+					    	    		InputStream is = url.openStream();
+
+					    	    		byte[] b = new byte[2048];
+					    	    		int length;
+
+					    	    		while ((length = is.read(b)) != -1) {
+					    	    			out.write(b, 0, length);
+					    	    		}
+
+					    	    		is.close();
+					    	    		out.closeEntry();
+			    					}
+			    					out.close();
+			    					
+									JOptionPane.showMessageDialog(null,"Imagens salvas com sucesso" ,"Sucesso", JOptionPane.INFORMATION_MESSAGE);
+			    				}
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								JOptionPane.showMessageDialog(null,"Houve um erro ao salvar as imagens." ,"Erro", JOptionPane.ERROR_MESSAGE);
+							}
+				        }
+	                }
+		        };th5.start();
 				
 			}
 		});
-		btnNewButton_1.setBounds(266, 529, 392, 87);
-		contentPane.add(btnNewButton_1);*/
-		
+		btnDownloadAllImg.setEnabled(false);
+		btnDownloadAllImg.setText("Transferir todas as imagens");
+		btnDownloadAllImg.setBounds(947, 125, 195, 25);
+		contentPane.add(btnDownloadAllImg);
 	}
+	
+	public static String generateRandomString() {
+        String uuid = UUID.randomUUID().toString();
+        return uuid.replace("-", "");
+    }
 	
 	public static void addImageToPanel(LinkedHashMap<String, ArrayList<String>> imgs, String img) {
 		
@@ -389,7 +514,7 @@ public class Frame extends JFrame {
 		JLabel lblImgNome;
 		JPanel panel1;
 		
-		System.out.println(img);
+		//System.out.println(img);
 		//if(img.contains(".php") || img.contains(".svg") || img.contains(".gif") || img.contains(".apng") || img.contains(".jpg") || img.contains(".png") || img.contains(".jpeg") || img.contains(".jfif")) {
 			if(!img.endsWith(".svg")) {
     			//System.out.println(img);
@@ -397,6 +522,31 @@ public class Frame extends JFrame {
 				String nome1 = "";
 	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
 	    		final String nome2 = nome1;
+	    		
+	    		/*if (chckbxAutosave.isSelected()) {	
+					try {
+							Connection connection = mysqlconnection.bdconnector();
+							System.out.println("Conectado.");
+			    			
+			    			String sql = "REPLACE INTO images (domain, path, title, alt) VALUES (?, ?, ?, ?)";
+			    			
+			    			PreparedStatement statement = connection.prepareStatement(sql);
+			    			
+			    			statement.setString(1, textLink.getText());
+			    			statement.setString(2, img);
+			    			statement.setString(3, imgs.get(img).get(1));
+			    			statement.setString(4, imgs.get(img).get(0));
+			    			int rows = statement.executeUpdate();
+			    			if (rows > 0) {
+			    				System.out.println("Dados atualizados.");
+			    			}
+			            	statement.close();
+			            	connection.close();
+					} catch (SQLException | IOException e1) {
+						System.out.println("Ocorreu um erro.");
+						e1.printStackTrace();
+					}
+				}*/
 	    		
 				JPopupMenu popup = new JPopupMenu();
 	    		JMenuItem down = new JMenuItem("Salvar imagem");
@@ -406,13 +556,19 @@ public class Frame extends JFrame {
 	    	                @Override
 	    	                public void run(){
 	    	                	try {
-	    	                		if(nome2.endsWith(".php")) {
-	    	                			API.saveImage(img, nome2.split("\\.")[0] + ".png");
-	    	                		}else {
-	    	                			API.saveImage(img, nome2);
-	    	                		}
-									
-									JOptionPane.showMessageDialog(null,"Imagem salva com sucesso" ,"Sucesso", JOptionPane.INFORMATION_MESSAGE);
+	    	                		JFileChooser chooser = new JFileChooser();
+	    	                		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    	        				int returnVal = chooser.showOpenDialog(null);
+	    	        				
+	    	        				if(returnVal == JFileChooser.APPROVE_OPTION) {
+		    	                		if(nome2.endsWith(".php")) {
+		    	                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + nome2.split("\\.")[0] + ".png");
+		    	                		}else {
+		    	                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + nome2);
+		    	                		}
+										
+										JOptionPane.showMessageDialog(null,"Imagem salva com sucesso" ,"Sucesso", JOptionPane.INFORMATION_MESSAGE);
+	    	        				}
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -424,7 +580,8 @@ public class Frame extends JFrame {
 	    		});
 	    		popup.add(down);
 	    		
-	    		if(nome1.length() > 20) { nome1 = nome1.substring(0, 15)+"..."+nome1.substring(nome1.lastIndexOf(".")-1, nome1.length()); }
+	    		//if(nome1.length() > 20 && nome1.contains(".")) { nome1 = nome1.substring(0, 15)+"..."+nome1.substring(nome1.lastIndexOf(".")-1, nome1.length()); } else
+	    		if(nome1.length() > 20) { nome1 = nome1.substring(0, 15)+"..."+nome1.substring(nome1.length()-5, nome1.length()); }
 	    		final String nome = nome1;
 				
 	    		Jimage = new JLabel();
@@ -583,7 +740,8 @@ public class Frame extends JFrame {
 		    		});
 		    		popup.add(down);
 		    		
-		    		if(nome.length() > 20) { nome = nome.substring(0, 15)+"..."+nome.substring(nome.lastIndexOf(".")-1, nome.length()); }
+		    		//if(nome.length() > 20) { nome = nome.substring(0, 15)+"..."+nome.substring(nome.lastIndexOf(".")-1, nome.length()); }
+		    		if(nome.length() > 20) { nome = nome.substring(0, 15)+"..."+nome.substring(nome.length()-5, nome.length()); }
 		    		
 	    			lblImgNome = new JLabel(nome);
 	    			lblImgNome.setAlignmentY(0.0f);
@@ -716,11 +874,10 @@ public class Frame extends JFrame {
     		}
 		//}
 		
-		//lblStatus.setText("Estado: " + (iVer++) + "\t/\t" + imgs.size());
 		progressBar.setValue(iVer++);
 		panel.revalidate();
 		panel.repaint();
 		btnFiltrar.setEnabled(true);
-		
+		btnDownloadAllImg.setEnabled(true);
     }
 }

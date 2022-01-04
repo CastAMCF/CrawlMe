@@ -29,7 +29,7 @@ public class API {
 			if(flag && url.startsWith(urlO) || !flag) {
 				try {
 					EDACrawler eda = new EDACrawler();
-					Payload ini = eda.process(url);
+					Payload ini = eda.process(url, profundidade);
 					
 					payloads.add(ini);
 					linksTemp.addAll(ini.links);
@@ -119,24 +119,30 @@ public class API {
 		BufferedImage image = null;
 		try {
 			image = ImageIO.read(new URL(path));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
-		int wi = image.getWidth();
-		int he = image.getHeight();
+			int wi = image.getWidth();
+			int he = image.getHeight();
+			
+			if(wi > label.getWidth()-25) {
+				wi = label.getWidth()-25;
+			}
+			if(he > label.getHeight()-25) {
+				he = label.getHeight()-25;
+			}
+			
+			Image imgScale = image.getScaledInstance(wi, he, Image.SCALE_SMOOTH);
+			ImageIcon newimg = new ImageIcon(imgScale);
+			label.setIcon(newimg);
 		
-		if(wi > label.getWidth()-25) {
-			wi = label.getWidth()-25;
+		} catch (IOException | NullPointerException e) {
+			System.out.println("Error displaying: " + path);
+			
+			ImageIcon ico = new ImageIcon(API.class.getResource("/images/error.png"));
+			Image img = ico.getImage();
+			Image imgScale = img.getScaledInstance(label.getWidth()-25, label.getHeight()-25, Image.SCALE_SMOOTH);
+			ImageIcon newimg = new ImageIcon(imgScale);
+			label.setIcon(newimg);
 		}
-		if(he > label.getHeight()-25) {
-			he = label.getHeight()-25;
-		}
-		
-		Image imgScale = image.getScaledInstance(wi, he, Image.SCALE_SMOOTH);
-		ImageIcon newimg = new ImageIcon(imgScale);
-		label.setIcon(newimg);
     }
 	
 	public static void setGifByURL(JLabel label, String url) {

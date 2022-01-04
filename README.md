@@ -1,12 +1,12 @@
-# qql-coisa-sobre-imagens
-Qualquer coisa sobre imagens
+# CrawlMe
+CrawlMe duh
 
 <!--![alt text]()</br>-->
 
-Desc</br></br></br>
+CrawlMe é uma aplicação que obtém todas as imagens de um ou vários sites de forma recursiva.</br></br></br>
 
-Bugs corrigidos</br>
-Cenas a apontar</br>
+Por enquanto ainda não se encontraram bugs</br>
+Para o menor tempo de busca a pesquisa pela base de dados é a melhor no entanto os dados guardados podem já não estar atualizados</br>
 <!--*De resto **acho** q tá bom*-->
 <br/><br/>
 > Solução Básica (até 14 valores) ✔️

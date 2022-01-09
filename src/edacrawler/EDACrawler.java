@@ -90,39 +90,40 @@ public class EDACrawler {
         /*if (!url.endsWith("/")) {
             url += "/";
         }*/
-
-        Document doc = Jsoup.connect(url).get();
-
-        Elements links = doc.select("a");
-        Iterator<Element> aux = links.iterator();
-
-        while (aux.hasNext()) {
-            String href = aux.next().attr("abs:href");
-            if (href.length() > 1) {
-            	if(href.contains("../")) {
-            		href = href.replace("../","");
-            	}
-            	if (!payload.links.contains(href)) {
-            		
-            		if (Frame.chckbxAutosave.isSelected()) {
-						try {
-							String sql2 = "REPLACE INTO linksvisitados (domain, link, nivel) VALUES (?,?,?)";
-			    			
-			    			PreparedStatement statement2 = connection.prepareStatement(sql2);
-			    			statement2.setString(1, url);
-			    			statement2.setString(2, href);
-			    			statement2.setInt(3, nivel);
-			    			statement2.executeUpdate();
-			            	statement2.close();
-						} catch (SQLException e) {
-							e.printStackTrace();
-						}
-            		}
-	            	
-            		payload.links.add(href);
-            	}
-            }
-        }
+    	if(url.startsWith("http")) {
+	        Document doc = Jsoup.connect(url).get();
+	
+	        Elements links = doc.select("a");
+	        Iterator<Element> aux = links.iterator();
+	
+	        while (aux.hasNext()) {
+	            String href = aux.next().attr("abs:href");
+	            if (href.length() > 1) {
+	            	if(href.contains("../")) {
+	            		href = href.replace("../","");
+	            	}
+	            	if (!payload.links.contains(href)) {
+	            		
+	            		if (Frame.chckbxAutosave.isSelected()) {
+							try {
+								String sql2 = "REPLACE INTO linksvisitados (domain, link, nivel) VALUES (?,?,?)";
+				    			
+				    			PreparedStatement statement2 = connection.prepareStatement(sql2);
+				    			statement2.setString(1, url);
+				    			statement2.setString(2, href);
+				    			statement2.setInt(3, nivel);
+				    			statement2.executeUpdate();
+				            	statement2.close();
+							} catch (SQLException e) {
+								e.printStackTrace();
+							}
+	            		}
+		            	
+	            		payload.links.add(href);
+	            	}
+	            }
+	        }
+    	}
     	
         return payload;
     }
@@ -130,67 +131,69 @@ public class EDACrawler {
     public Payload processImgs(String url, int nivel) throws IOException {
     	
     	Payload payload = new Payload();
-
-        Document doc = Jsoup.connect(url).get();
-        
-        Elements imgs = doc.select("img");
-        Iterator<Element> aux = imgs.iterator();
-
-        while (aux.hasNext()) {
-        	Element elem = aux.next();
-            String src = elem.attr("abs:src");
-            String title = elem.attr("abs:title");
-            String alt = elem.attr("abs:alt");
-            if (src.length() > 1) {
-            	if(src.contains("../")) {
-            		src = src.replace("../","");
-            	}
-            	if(src.contains("/./")) {
-            		src = src.replace("/./","/");
-            	}
-            	if (!payload.imgs.containsKey(src)) {
-            		//System.out.println("src: " + src);
-            		ArrayList<String> attrs = new ArrayList<>();
-            		if(title.length() > 0) {
-            			//System.out.println("title: " + title.substring(title.lastIndexOf("/")+1, title.length()));
-            			title = title.substring(title.lastIndexOf("/")+1, title.length());
-            			attrs.add(title);
-            		}else {
-            			//System.out.println("title:");
-            			title = "";
-            			attrs.add(title);
-            		}
-            		if(alt.length() > 0) {
-            			//System.out.println("alt: " + alt.substring(alt.lastIndexOf("/")+1, alt.length()));
-            			alt = alt.substring(alt.lastIndexOf("/")+1, alt.length());
-            			attrs.add(alt);
-            		}else {
-            			//System.out.println("alt:");
-            			alt = "";
-            			attrs.add("");
-            		}
-            		
-            		if (Frame.chckbxAutosave.isSelected()) {
-    					try {
-    						String sql = "REPLACE INTO images (domain, path, title, alt, nivel) VALUES (?, ?, ?, ?, ?)";
-			    			
-			    			PreparedStatement statement = connection.prepareStatement(sql);
-			    			
-			    			statement.setString(1, url);
-			    			statement.setString(2, src);
-			    			statement.setString(3, alt);
-			    			statement.setString(4, title);
-			    			statement.setInt(5, nivel);
-			    			statement.executeUpdate();
-    					} catch (SQLException e) {
-    						e.printStackTrace();
-    					}
-                	}
-            		
-            		payload.imgs.put(src, attrs);
-            	}
-            }
-        }
+    	
+    	if(url.startsWith("http")) {
+	        Document doc = Jsoup.connect(url).get();
+	        
+	        Elements imgs = doc.select("img");
+	        Iterator<Element> aux = imgs.iterator();
+	
+	        while (aux.hasNext()) {
+	        	Element elem = aux.next();
+	            String src = elem.attr("abs:src");
+	            String title = elem.attr("abs:title");
+	            String alt = elem.attr("abs:alt");
+	            if (src.length() > 1) {
+	            	if(src.contains("../")) {
+	            		src = src.replace("../","");
+	            	}
+	            	if(src.contains("/./")) {
+	            		src = src.replace("/./","/");
+	            	}
+	            	if (!payload.imgs.containsKey(src)) {
+	            		//System.out.println("src: " + src);
+	            		ArrayList<String> attrs = new ArrayList<>();
+	            		if(title.length() > 0) {
+	            			//System.out.println("title: " + title.substring(title.lastIndexOf("/")+1, title.length()));
+	            			title = title.substring(title.lastIndexOf("/")+1, title.length());
+	            			attrs.add(title);
+	            		}else {
+	            			//System.out.println("title:");
+	            			title = "";
+	            			attrs.add(title);
+	            		}
+	            		if(alt.length() > 0) {
+	            			//System.out.println("alt: " + alt.substring(alt.lastIndexOf("/")+1, alt.length()));
+	            			alt = alt.substring(alt.lastIndexOf("/")+1, alt.length());
+	            			attrs.add(alt);
+	            		}else {
+	            			//System.out.println("alt:");
+	            			alt = "";
+	            			attrs.add("");
+	            		}
+	            		
+	            		if (Frame.chckbxAutosave.isSelected()) {
+	    					try {
+	    						String sql = "REPLACE INTO images (domain, path, title, alt, nivel) VALUES (?, ?, ?, ?, ?)";
+				    			
+				    			PreparedStatement statement = connection.prepareStatement(sql);
+				    			
+				    			statement.setString(1, url);
+				    			statement.setString(2, src);
+				    			statement.setString(3, alt);
+				    			statement.setString(4, title);
+				    			statement.setInt(5, nivel);
+				    			statement.executeUpdate();
+	    					} catch (SQLException e) {
+	    						e.printStackTrace();
+	    					}
+	                	}
+	            		
+	            		payload.imgs.put(src, attrs);
+	            	}
+	            }
+	        }
+    	}
     	
         return payload;
     }

@@ -398,14 +398,20 @@ public class Frame extends JFrame {
 			    				if(returnVal == JFileChooser.APPROVE_OPTION) {
 			    					
 			    					for(String img : Himgs.keySet()) {
-				    					String nome1 = "";
-					    	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
-					                	
-				                		if(nome1.endsWith(".php")) {
-				                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + API.generateRandomString() + ".png");
-				                		}else {
-				                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + API.generateRandomString() + "." + nome1.split("\\.")[1]);
-				                		}
+			    						if(img.startsWith("http")) {
+					    					String nome1 = "";
+						    	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
+						                	
+					                		if(nome1.endsWith(".php")) {
+					                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + API.generateRandomString() + ".png");
+					                		}else {
+					                			if(nome1.split("\\.").length == 1) {
+					                				API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + API.generateRandomString() + ".png");
+							    	    		}else {
+							    	    			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + API.generateRandomString() + "." + nome1.split("\\.")[1]);
+							    	    		}
+					                		}
+			    						}
 			    					}
 									JOptionPane.showMessageDialog(null,"Imagens salvas com sucesso" ,"Sucesso", JOptionPane.INFORMATION_MESSAGE);
 			    				}
@@ -428,24 +434,32 @@ public class Frame extends JFrame {
 				    	    		ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f));
 			    					
 			    					for(String img : Himgs.keySet()) {
-				    					String nome1 = "";
-					    	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
-					    	    		if(nome1.endsWith(".php")) { nome1 = nome1.split("\\.")[0] + ".png";}
-					    	    		
-					    	    		ZipEntry e = new ZipEntry(API.generateRandomString() + "." + nome1.split("\\.")[1]);
-					    	    		out.putNextEntry(e);
-					    	    		URL url = new URL(img);
-					    	    		InputStream is = url.openStream();
-
-					    	    		byte[] b = new byte[2048];
-					    	    		int length;
-
-					    	    		while ((length = is.read(b)) != -1) {
-					    	    			out.write(b, 0, length);
-					    	    		}
-
-					    	    		is.close();
-					    	    		out.closeEntry();
+			    						if(img.startsWith("http")) {
+					    					String nome1 = "";
+						    	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
+						    	    		if(nome1.endsWith(".php")) { nome1 = nome1.split("\\.")[0] + ".png";}
+						    	    		
+						    	    		ZipEntry e;
+						    	    		if(nome1.split("\\.").length == 1) {
+						    	    			e = new ZipEntry(API.generateRandomString() + ".png");
+						    	    		}else {
+						    	    			e = new ZipEntry(API.generateRandomString() + "." + nome1.split("\\.")[1]);
+						    	    		}
+						    	    		
+						    	    		out.putNextEntry(e);
+						    	    		URL url = new URL(img);
+						    	    		InputStream is = url.openStream();
+	
+						    	    		byte[] b = new byte[2048];
+						    	    		int length;
+	
+						    	    		while ((length = is.read(b)) != -1) {
+						    	    			out.write(b, 0, length);
+						    	    		}
+	
+						    	    		is.close();
+						    	    		out.closeEntry();
+			    						}
 			    					}
 			    					out.close();
 			    					

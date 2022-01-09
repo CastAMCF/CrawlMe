@@ -3,11 +3,8 @@ package GUI;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -56,6 +53,8 @@ import javax.swing.JFileChooser;
 
 import java.awt.GridBagLayout;
 import javax.swing.JProgressBar;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 
 @SuppressWarnings("serial")
 public class Frame extends JFrame {
@@ -109,6 +108,7 @@ public class Frame extends JFrame {
 	 * Create the frame.
 	 */
 	public Frame() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/logo.png")));
 		setTitle("CrawlMe");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1160, 728);
@@ -121,16 +121,11 @@ public class Frame extends JFrame {
 		});
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(null);
 		
 		JScrollPane jScrollPane1 = new JScrollPane();
-		jScrollPane1.setBounds(12, 156, 1130, 524);
-		contentPane.add(jScrollPane1);
 		
 		panel = new JPanel();
 		jScrollPane1.setViewportView(panel);
-		/*DragLayout layout = new DragLayout();
-		panel.setLayout(layout);*/
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 0, 0};
 		gbl_panel.rowHeights = new int[]{0, 0};
@@ -140,17 +135,11 @@ public class Frame extends JFrame {
 		
 		JLabel lblLink = new JLabel();
 		lblLink.setText("Link :");
-		lblLink.setBounds(20, 17, 40, 16);
-		contentPane.add(lblLink);
 		
 		JLabel lblNvel = new JLabel();
 		lblNvel.setText(" N\u00EDvel :");
-		lblNvel.setBounds(12, 64, 48, 16);
-		contentPane.add(lblNvel);
 		
 		progressBar = new JProgressBar();
-		progressBar.setBounds(12, 134, 686, 16);
-		contentPane.add(progressBar);
 		
 		JSlider Slider = new JSlider();
 		Slider.setValue(1);
@@ -159,20 +148,12 @@ public class Frame extends JFrame {
 		Slider.setMinimum(1);
 		Slider.setMaximum(12);
 		Slider.setMajorTickSpacing(1);
-		Slider.setBounds(62, 62, 420, 52);
-		contentPane.add(Slider);
 		
 		JCheckBox chckbxMesmoDomnio = new JCheckBox("Mesmo dom\u00EDnio");
-		chckbxMesmoDomnio.setBounds(490, 43, 142, 15);
-		contentPane.add(chckbxMesmoDomnio);
 		
 		chckbxAutosave = new JCheckBox("Guardar dados da pesquisa");
-		chckbxAutosave.setBounds(490, 56, 192, 25);
-		contentPane.add(chckbxAutosave);
 		
 		chckbxOfflineSearch = new JCheckBox("Pesquisa p. dados guardados");
-		chckbxOfflineSearch.setBounds(490, 75, 208, 25);
-		contentPane.add(chckbxOfflineSearch);
 		
 		JButton btnVoltar = new JButton();
 		btnVoltar.addActionListener(new ActionListener() {
@@ -200,8 +181,6 @@ public class Frame extends JFrame {
 		});
 		btnVoltar.setText("Voltar");
 		btnVoltar.setEnabled(false);
-		btnVoltar.setBounds(938, 85, 95, 25);
-		contentPane.add(btnVoltar);
 		
 		btnFiltrar = new JButton();
 		btnFiltrar.addActionListener(new ActionListener() {
@@ -242,8 +221,6 @@ public class Frame extends JFrame {
 		});
 		btnFiltrar.setEnabled(false);
 		btnFiltrar.setText("Filtrar");
-		btnFiltrar.setBounds(828, 85, 95, 25);
-		contentPane.add(btnFiltrar);
 		
 		JButton btnSearch = new JButton();
 		btnSearch.addActionListener(new ActionListener() {
@@ -253,10 +230,10 @@ public class Frame extends JFrame {
 				th = new Thread() {
 	                @Override
 	                public void run(){
-	                	long milis1 = System.currentTimeMillis();
+	                	/*long milis1 = System.currentTimeMillis();
 	                	SimpleDateFormat formatter= new SimpleDateFormat("HH:mm:ss z");
 	                	Date date = new Date(milis1);
-	                	System.out.println("Start Search: " + formatter.format(date));
+	                	System.out.println("Start Search: " + formatter.format(date));*/
 	                	progressBar.setValue(1);
 	                	
 						String link = textLink.getText();
@@ -285,7 +262,7 @@ public class Frame extends JFrame {
 				    	if(textTema.getText().isEmpty()) {
 				    		imgs = Himgs;
 				    		progressBar.setMaximum(imgs.size());
-				    		System.out.println("Imagens: " + imgs.size());
+				    		//System.out.println("Imagens: " + imgs.size());
 				    	}else {
 				    		for (String key : Himgs.keySet()) {
 		                		//System.out.println("key: " + key + " value: " + Himgs.get(key));
@@ -305,12 +282,12 @@ public class Frame extends JFrame {
 		                		}
 		                	}
 				    		progressBar.setMaximum(imgs.size());
-				    		System.out.println(imgs.size());
+				    		//System.out.println(imgs.size());
 				    	}
-				    	long milis2 = System.currentTimeMillis();
+				    	/*long milis2 = System.currentTimeMillis();
 				    	Date date1 = new Date(milis2);
 				    	System.out.println("End Search | Start Display: " + formatter.format(date1) + " - Time: " + (new SimpleDateFormat("mm:ss:SSS")).format(new Date(milis2 - milis1)));
-				    	
+				    	*/
 				    	btnFiltrar.setEnabled(false);
 				    	btnDownloadAllImg.setEnabled(false);
 				    	panel.removeAll();
@@ -322,18 +299,16 @@ public class Frame extends JFrame {
 				    		addImageToPanel(imgs, img);
 				    	}
 				    	
-				    	long milis3 = System.currentTimeMillis();
+				    	/*long milis3 = System.currentTimeMillis();
 				    	Date date2 = new Date(System.currentTimeMillis());
 				    	System.out.println("End Display: " + formatter.format(date2) + " - Time: " + (new SimpleDateFormat("mm:ss:SSS")).format(new Date(milis3 - milis2)));
-
+				    	*/
 					}
 		        };th.start();
 				
 			}
 		});
 		btnSearch.setText("Procurar");
-		btnSearch.setBounds(494, 102, 95, 25);
-		contentPane.add(btnSearch);
 		
 		JButton btnCancel = new JButton();
 		btnCancel.addActionListener(new ActionListener() {
@@ -362,21 +337,13 @@ public class Frame extends JFrame {
 			}
 		});
 		btnCancel.setText("Cancelar");
-		btnCancel.setBounds(603, 102, 88, 25);
-		contentPane.add(btnCancel);
 		
 		textLink = new JTextField();
-		textLink.setBounds(62, 13, 636, 27);
-		contentPane.add(textLink);
 		
 		JLabel lblTema = new JLabel("Tema");
 		lblTema.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTema.setBounds(901, 16, 56, 16);
-		contentPane.add(lblTema);
 		
 		textTema = new JTextField();
-		textTema.setBounds(818, 45, 228, 27);
-		contentPane.add(textTema);
 		
 		JButton btnResetDB = new JButton();
 		btnResetDB.addActionListener(new ActionListener() {
@@ -409,8 +376,6 @@ public class Frame extends JFrame {
 			}
 		});
 		btnResetDB.setText("Eliminar todos os dados guardados");
-		btnResetDB.setBounds(703, 125, 241, 25);
-		contentPane.add(btnResetDB);
 		
 		btnDownloadAllImg = new JButton();
 		btnDownloadAllImg.addActionListener(new ActionListener() {
@@ -437,9 +402,9 @@ public class Frame extends JFrame {
 					    	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
 					                	
 				                		if(nome1.endsWith(".php")) {
-				                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + generateRandomString() + ".png");
+				                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + API.generateRandomString() + ".png");
 				                		}else {
-				                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + generateRandomString() + "." + nome1.split("\\.")[1]);
+				                			API.saveImage(img, chooser.getSelectedFile().getAbsolutePath() + "\\" + API.generateRandomString() + "." + nome1.split("\\.")[1]);
 				                		}
 			    					}
 									JOptionPane.showMessageDialog(null,"Imagens salvas com sucesso" ,"Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -467,7 +432,7 @@ public class Frame extends JFrame {
 					    	    		if(img.split("/")[img.split("/").length-1].contains("?")) { nome1 = img.split("/")[img.split("/").length-1].split("\\?")[0]; }else{ nome1 = img.split("/")[img.split("/").length-1]; }
 					    	    		if(nome1.endsWith(".php")) { nome1 = nome1.split("\\.")[0] + ".png";}
 					    	    		
-					    	    		ZipEntry e = new ZipEntry(generateRandomString() + "." + nome1.split("\\.")[1]);
+					    	    		ZipEntry e = new ZipEntry(API.generateRandomString() + "." + nome1.split("\\.")[1]);
 					    	    		out.putNextEntry(e);
 					    	    		URL url = new URL(img);
 					    	    		InputStream is = url.openStream();
@@ -499,14 +464,111 @@ public class Frame extends JFrame {
 		});
 		btnDownloadAllImg.setEnabled(false);
 		btnDownloadAllImg.setText("Transferir todas as imagens");
-		btnDownloadAllImg.setBounds(947, 125, 195, 25);
-		contentPane.add(btnDownloadAllImg);
+		GroupLayout gl_contentPane = new GroupLayout(contentPane);
+		gl_contentPane.setHorizontalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+					.addGap(12)
+					.addComponent(lblLink, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+					.addGap(2)
+					.addComponent(textLink, GroupLayout.DEFAULT_SIZE, 639, Short.MAX_VALUE)
+					.addGap(203)
+					.addComponent(lblTema, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
+					.addGap(185))
+				.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(lblNvel, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+							.addGap(2)
+							.addComponent(Slider, GroupLayout.PREFERRED_SIZE, 419, GroupLayout.PREFERRED_SIZE)
+							.addGap(8)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(chckbxOfflineSearch, GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(chckbxAutosave, GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+									.addGap(16))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(chckbxMesmoDomnio, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+									.addGap(66))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addGap(4)
+									.addComponent(btnSearch, GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+									.addGap(14)
+									.addComponent(btnCancel, GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
+									.addGap(4))))
+						.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 686, Short.MAX_VALUE))
+					.addGap(5)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(115)
+							.addComponent(textTema, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(125)
+							.addComponent(btnFiltrar, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)
+							.addGap(15)
+							.addComponent(btnVoltar, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(btnResetDB, GroupLayout.PREFERRED_SIZE, 241, GroupLayout.PREFERRED_SIZE)
+							.addGap(3)
+							.addComponent(btnDownloadAllImg, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE))))
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(7)
+					.addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 1130, Short.MAX_VALUE))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(8)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(4)
+							.addComponent(lblLink))
+						.addComponent(textLink, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(3)
+							.addComponent(lblTema)))
+					.addGap(3)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addGap(21)
+									.addComponent(lblNvel))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addGap(19)
+									.addComponent(Slider, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_contentPane.createSequentialGroup()
+											.addGap(32)
+											.addComponent(chckbxOfflineSearch))
+										.addGroup(gl_contentPane.createSequentialGroup()
+											.addGap(13)
+											.addComponent(chckbxAutosave))
+										.addComponent(chckbxMesmoDomnio, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE))
+									.addGap(2)
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+										.addComponent(btnSearch)
+										.addComponent(btnCancel))))
+							.addGap(7)
+							.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(2)
+							.addComponent(textTema, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+							.addGap(13)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnFiltrar)
+								.addComponent(btnVoltar))
+							.addGap(15)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnResetDB)
+								.addComponent(btnDownloadAllImg))))
+					.addGap(6)
+					.addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE))
+		);
+		contentPane.setLayout(gl_contentPane);
 	}
-	
-	public static String generateRandomString() {
-        String uuid = UUID.randomUUID().toString();
-        return uuid.replace("-", "");
-    }
 	
 	public static void addImageToPanel(LinkedHashMap<String, ArrayList<String>> imgs, String img) {
 		

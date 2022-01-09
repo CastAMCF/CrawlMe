@@ -13,6 +13,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -170,5 +171,10 @@ public class API {
 	public static String removerSpecialCharacter(String str) {
 	    return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 	}
+	
+	public static String generateRandomString() {
+        String uuid = UUID.randomUUID().toString();
+        return uuid.replace("-", "");
+    }
 }
 

@@ -20,7 +20,7 @@ Para o menor tempo de busca a pesquisa pela base de dados é a melhor no entanto
 - [x] Tudo o que está descrito na solução intermédia
 - [x] Guardar o resultado da pesquisa em disco para consultar posteriormente em modo offline, sem ter acesso à internet.
 
-</br>Nota Final: ??
+</br>Nota Final: 19
 </br>
 </br>
 </br>INSTITUTO POLITÉCNICO DE TOMAR (c)2022
